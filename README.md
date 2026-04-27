@@ -64,3 +64,15 @@ Example for "case-000"
 sudo mkdir -p /home/shared/case-000/{samples,output,tmp}
 sudo chmod -R 777 /home/shared
 ```
+
+## 4. Backup WSL
+Backup WSL with previous configuration. Run as administrator on windows:
+```cmd
+"wsl --export Ubuntu soc-ubuntu-init.tar"
+```
+Copy tar file into external location. This is the clean WSL to revert after each investigation.
+
+## 5. Investigations
+Log in as soc user for investigations. Static analysis shouldn't require higher privileges, but if needed, use ladm account for sudo activities.
+Copy files for analysis from windows workstation to WSL Ubuntu /home/shared/case-nnn/samples (TIP: make easily accessible link for it to windows desktop)
+During analysis, internet connectivity for WSL should be limited as a precaution. To do this, run script "wsl-net-isolate.sh".
