@@ -2,7 +2,7 @@
 WLS ubuntu for SOC tasks
 
 ## 1. Basic installation tasks
-In windowns, install WSL Ubuntu
+In windows, install WSL Ubuntu
 ```cmd
 wsl --install -d Ubuntu
 ```
@@ -17,18 +17,23 @@ Create user account for investigations
 ```bash
 useradd -m soc
 passwd soc
+usermod -aG sudo soc
 chsh -s /bin/bash soc
 ```
-Create local admin account and ad it for sudoers
-```bash
-useradd -m ladm
-passwd ladm
-usermod -aG sudo ladm
-chsh -s /bin/bash ladm
+
+Edit /etc/wsl.conf file. Specify default login for soc user instead of root.
+```
+[user]
+default=soc
+```
+In windows, restar WSL Ubuntu
+```cmd
+wsl --shutdown
+wsl -d Ubuntu --cd ~
 ```
 
 ## 2. Install tools
-Log in as ladm ("wsl -d Ubuntu -u ladm --cd ~") and install following packages from repository
+Log in as soc and install following packages from repository
 ```bash
 sudo apt install -y \
   nftables python3 python3-pip \
@@ -42,11 +47,9 @@ Install Didier Stevens Suite from Github
 ```bash
 sudo git clone https://github.com/DidierStevens/DidierStevensSuite.git /opt/tools/didier
 ```
-Create links for /opt/tools/ for soc and ladm users (optional)
+Create links for /opt/tools/ for soc 
 ```bash
-for u in soc ladm; do
-  sudo -u "$u" ln -s /opt/tools /home/$u/tools
-done
+ln -s /opt/tools /home/$u/tools
 ```
 Install MS Office and Macro investigation tools via PIP (do this for soc user too, no admin rights required)
 ```bash
@@ -66,14 +69,24 @@ sudo mkdir -p /home/shared/case-000/{samples,output,tmp}
 sudo chmod -R 777 /home/shared
 ```
 
-## 4. Backup WSL
+## 4. Git clone ./wsl-net-isolate.sh
+During analysis, internet connectivity for WSL should be limited as a precaution. 
+To make this possibler, clone this git repository and make wsl-net-isolate.sh executable.
+```bash
+git clone https://github.com/luparpe/soc-wsl/
+chmod a+x soc-wsl/wsl-net-isolate.sh
+```
+This script can be run during investigation.
+
+## 5. Backup WSL
 Backup WSL with previous configuration. Run as administrator on windows:
 ```cmd
-"wsl --export Ubuntu soc-ubuntu-init.tar"
+"wsl --export Ubuntu soc-ubuntu-clean.tar"
 ```
 Copy tar file into external location. This is the clean WSL to revert after each investigation.
 
-## 5. Investigations
-Log in as soc user for investigations. Static analysis shouldn't require higher privileges, but if needed, use ladm account for sudo activities.
-Copy files for analysis from windows workstation to WSL Ubuntu /home/shared/case-nnn/samples (TIP: make easily accessible link for it to windows desktop)
-During analysis, internet connectivity for WSL should be limited as a precaution. To do this, run script "wsl-net-isolate.sh".
+## 6. Investigations
+Log in as soc user for investigations. 
+Copy files for analysis from windows workstation to WSL Ubuntu /home/shared/case-nnn/samples (TIP: make easily accessible link for it to windows desktop).
+During analysis, internet connectivity for WSL should be limited as a precaution. To do this, run script "./wsl-net-isolate.sh start" (and "stop" when done)
+sudo shouldn't be needed for basic static analysis. Use it with causion!
