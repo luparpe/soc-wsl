@@ -31,7 +31,8 @@ chsh -s /bin/bash ladm
 Log in as ladm ("wsl -d Ubuntu -u ladm --cd ~") and install following packages from repository
 ```bash
 sudo apt install -y \
-  python3 python3-pip git curl unzip p7zip-full \
+  nftables python3 python3-pip \
+  git curl unzip p7zip-full \
   file binutils exiftool jq \
   ripgrep xxd less wget \
   ripmime mpack \
